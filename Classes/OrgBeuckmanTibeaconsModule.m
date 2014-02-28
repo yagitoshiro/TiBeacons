@@ -139,12 +139,18 @@
     ENSURE_SINGLE_ARG(args, NSDictionary);
 
     NSString *uuid = [TiUtils stringValue:[args objectForKey:@"uuid"]];
-    NSInteger major = (NSUInteger)[TiUtils intValue:[args objectForKey:@"major"] def:-1];
-    NSInteger minor = (NSUInteger)[TiUtils intValue:[args objectForKey:@"minor"] def:-1];
+    NSInteger major = [TiUtils intValue:[args objectForKey:@"major"] def:-1];
+    NSInteger minor = [TiUtils intValue:[args objectForKey:@"minor"] def:-1];
     
     NSString *identifier = [TiUtils stringValue:[args objectForKey:@"identifier"]];
     
-    CLBeaconRegion *region = [self createBeaconRegionWithUUID:uuid major:major minor:minor identifier:identifier];
+    CLBeaconRegion *region;
+    if(major > -1){
+        NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:uuid];
+        region =  [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID identifier:identifier];
+    }else{
+        region = [self createBeaconRegionWithUUID:uuid major:major minor:minor identifier:identifier];
+    }
     
     NSLog(@"[INFO] Turning on region monitoring in %@", region);
 
